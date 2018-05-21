@@ -1,0 +1,89 @@
+;
+; rfb.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=Sample ; TODO: edit Class
+ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=rfb.cat
+DriverVer = 05/14/2018,18.24.41.660
+
+[DestinationDirs]
+DefaultDestDir = 12
+rfb_Device_CoInstaller_CopyFiles = 11
+
+; ================= Class section =====================
+
+[ClassInstall32]
+Addreg=SampleClassReg
+
+[SampleClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+rfb.sys  = 1,,
+;
+
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[Standard.NTamd64]
+%rfb.DeviceDesc%=rfb_Device, PCI\VEN_1234&DEV_11E9&SUBSYS_11001AF4&REV_10 ; TODO: edit hw-id
+
+[rfb_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+rfb.sys
+
+;-------------- Service installation
+[rfb_Device.NT.Services]
+AddService = rfb,%SPSVCINST_ASSOCSERVICE%, rfb_Service_Inst
+
+; -------------- rfb driver install sections
+[rfb_Service_Inst]
+DisplayName    = %rfb.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\rfb.sys
+
+;
+;--- rfb_Device Coinstaller installation ------
+;
+
+[rfb_Device.NT.CoInstallers]
+AddReg=rfb_Device_CoInstaller_AddReg
+CopyFiles=rfb_Device_CoInstaller_CopyFiles
+
+[rfb_Device_CoInstaller_AddReg]
+;
+
+
+[rfb_Device_CoInstaller_CopyFiles]
+;
+
+
+[rfb_Device.NT.Wdf]
+KmdfService =  rfb, rfb_wdfsect
+[rfb_wdfsect]
+KmdfLibraryVersion = 1.15
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+ClassName="Samples" ; TODO: edit ClassName
+DiskName = "rfb Installation Disk"
+rfb.DeviceDesc = "rfb Device"
+rfb.SVCDESC = "rfb Service"
